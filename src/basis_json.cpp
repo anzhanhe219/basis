@@ -135,36 +135,42 @@ void BSJsonValue::clear()
 
 int64& BSJsonValue::as_int()
 {
+	clear();
 	mType = JSON_INTEGER;
 	return m_int_value;
 }
 
 string& BSJsonValue::as_string()
 {
+	clear();
 	mType = JSON_STRING;
 	return m_str_value;
 }
 
 double& BSJsonValue::as_real()
 {
+	clear();
 	mType = JSON_REAL;
 	return m_doub_value;
 }
 
 bool& BSJsonValue::as_bool()
 {
+	clear();
 	mType = JSON_BOOL;
 	return m_bool_value;
 }
 
 BSJsonValue::OBJECT& BSJsonValue::as_object()
 {
+	clear();
 	mType = JSON_OBJECT;
 	return m_obj_value;
 }
 
 BSJsonValue::ARRARY& BSJsonValue::as_arr()
 {
+	clear();
 	mType = JSON_ARRARY;
 	return m_arr_value;
 }
@@ -644,10 +650,10 @@ bool BSJsonParser::parseChar(BSJsonValue& _result, int nextChar)
 		buffer[i] = c;
 		}
 
-		if (!utf8IsLegal((unsigned char*) buffer, count))
+		/*if (!utf8IsLegal((unsigned char*) buffer, count))
 		{
-			return false;
-		}
+		return false;
+		}*/
 
 		// 将编码放到缓冲区中
 		for(int i = 0; i < count; ++i)
@@ -700,6 +706,11 @@ bool BSJsonParser::parseChar(BSJsonValue& _result, int nextChar)
 			mBuff.pop_back();
 			mType = JSON_T_STRING;
 			mState = ST;
+			break;
+		// Null值
+		case NU:
+			mType = JSON_T_NULL;
+			mState = N1;
 			break;
 		// " 结束为止的引号
 		case -4:

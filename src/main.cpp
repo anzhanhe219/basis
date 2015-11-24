@@ -1,28 +1,24 @@
 #include "basis_define.h"
+#include "basis_json.h"
 #include "basis_notification.h"
 #include "basis_observer.h"
 #include "basis_observer_ext.h"
 #include "basis_subject.h"
-#include "basis_md5.h"
-#include <iostream>
-#include "basis_smart_ptr.h"
-#include "stdio.h"
 
-class TestA
+void testJsonParse()
 {
-public:
-	TestA() 
-	{
-		printf("construct\n");
-	}
-
-	~TestA()
-	{
-		printf("destruct\n");
-	}
+	string jsonStr = "{\"a\":\"Ìì\", \"b\": \"cc\"}";
+	string jsonStr1 = "{\"key\":[4,6,311], \"tian\":{\"qi\": 999}}";
+	BSJsonParser jsonParse;
+	BSJsonValue jsonValue;
+	if (!jsonParse.parse(jsonStr, jsonValue))
+		return;
 };
 
 int main()
 {
+
+	testJsonParse();
+
 	return 0;
 }
