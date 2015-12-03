@@ -63,10 +63,16 @@
     <ClInclude Include="..\include\basis_runnable.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\basis_time.h">
+    <ClInclude Include="..\include\basis_rw_lock.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\basis_rw_lock.h">
+    <ClInclude Include="..\include\basis_timespan.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\basis_timestamp.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\basis_timeformat.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\basis_scope_locker.h">
@@ -110,10 +116,16 @@
     <ClCompile Include="..\src\basis_thread.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\basis_time.cpp">
+    <ClCompile Include="..\src\basis_rw_lock.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\basis_rw_lock.cpp">
+    <ClCompile Include="..\src\basis_timespan.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\basis_timestamp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\basis_timeformat.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

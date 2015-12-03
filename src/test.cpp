@@ -33,12 +33,6 @@ public:
 
 int main()
 {
-	the_event.set();
-	the_event.set();
-	the_event.set();
-	the_event.set();
-	the_event.reset();
-
 	BSThread thread1("t1");
 	BSThread thread2("t2");
 
