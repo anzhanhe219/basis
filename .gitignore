@@ -6,3 +6,6 @@ vs2012/basis.opensdf
 vs2012/basis.vcxproj.user
 *.suo
 /cmake
+/msvc/*/Debug
+/msvc/*/Release
+*.opensdf
