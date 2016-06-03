@@ -66,6 +66,9 @@
     <ClCompile Include="..\..\src\basis_var.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\basis_event_loop.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\basis_atomic.h">
@@ -156,6 +159,12 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\basis_var_holder.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\basis_multiplexer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\basis_event_loop.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

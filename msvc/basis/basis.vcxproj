@@ -89,6 +89,7 @@ copy $(OutDir)\$(ProjectName).pdb $(ProjectDir)\..\..\lib\$(ProjectName).pdb</Co
     <ClCompile Include="..\..\src\basis_buffer.cpp" />
     <ClCompile Include="..\..\src\basis_critical.cpp" />
     <ClCompile Include="..\..\src\basis_event.cpp" />
+    <ClCompile Include="..\..\src\basis_event_loop.cpp" />
     <ClCompile Include="..\..\src\basis_global.cpp" />
     <ClCompile Include="..\..\src\basis_ipaddr.cpp" />
     <ClCompile Include="..\..\src\basis_json.cpp" />
@@ -112,10 +113,12 @@ copy $(OutDir)\$(ProjectName).pdb $(ProjectDir)\..\..\lib\$(ProjectName).pdb</Co
     <ClInclude Include="..\..\include\basis_critical.h" />
     <ClInclude Include="..\..\include\basis_define.h" />
     <ClInclude Include="..\..\include\basis_event.h" />
+    <ClInclude Include="..\..\include\basis_event_loop.h" />
     <ClInclude Include="..\..\include\basis_ipaddr.h" />
     <ClInclude Include="..\..\include\basis_json.h" />
     <ClInclude Include="..\..\include\basis_macro.h" />
     <ClInclude Include="..\..\include\basis_md5.h" />
+    <ClInclude Include="..\..\include\basis_multiplexer.h" />
     <ClInclude Include="..\..\include\basis_mutex.h" />
     <ClInclude Include="..\..\include\basis_nocopy.h" />
     <ClInclude Include="..\..\include\basis_notification.h" />
