@@ -3,5 +3,5 @@
 
 TEST(Iptest, ttt)
 {
-	EXPECT_EQ(BSIpAddr::make_ipaddr_by_ip("115.159.54.142").to_str(), "115.159.54.142");
+	EXPECT_EQ(basis::BSIpAddr::make_ipaddr_by_ip("115.159.54.142").to_str(), "115.159.54.142");
 }

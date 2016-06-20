@@ -127,5 +127,4 @@ namespace basis
 
 }; // namespace basis
 
-using namespace basis;
 #endif //_BASIS_MACRO_H_

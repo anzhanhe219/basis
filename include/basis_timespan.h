@@ -73,5 +73,4 @@ inline bool BSTimeSpan::operator <= ( const BSTimeSpan& timespan ) const
 
 }
 
-using namespace basis;
 #endif

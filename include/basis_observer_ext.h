@@ -80,7 +80,6 @@ private:
 	// lock ?????
 };
 
-
 } // namespace basis
 
 

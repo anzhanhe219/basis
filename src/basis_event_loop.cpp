@@ -1,5 +1,6 @@
 #include "basis_event_loop.h"
 
+
 namespace basis
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -90,7 +91,7 @@ namespace basis
 
 	void BSEventLoop::DeleteFileEvent(int fd, int mask)
 	{
-		if (fd >= m_maxfd) return;
+		if (fd > m_maxfd) return;
 		BSFileEvent *fe = &m_events[fd];
 		if (fe->m_mask == ae_none)  return;
 
@@ -114,7 +115,43 @@ namespace basis
 
 	int BSEventLoop::Wait(int fd, int mask, long long milliseconds)
 	{
-		return -1;
+		FD_SET r_set, w_set;
+		FD_ZERO(&r_set);
+		FD_ZERO(&w_set);
+		if (mask & ae_readable)
+		{
+			FD_SET(fd, &r_set);
+		}
+		if (mask & ae_writeable)
+		{
+			FD_SET(fd, &w_set);
+		}
+
+		struct  timeval *pval = NULL, val;
+		if (milliseconds >= 0)
+		{
+			val.tv_sec = (int32)(milliseconds / 1000);
+			val.tv_usec = (int32)(milliseconds % 1000);
+			pval = &val;
+		}
+		int result = ::select(fd+1, &r_set, &w_set, NULL, pval);
+		if (result > 0)
+		{
+			result = 0;
+			if (FD_ISSET(fd, &r_set))
+			{
+				result |= ae_readable;
+			}
+			if (FD_ISSET(fd, &w_set))
+			{
+				result |= ae_writeable;
+			}
+		}
+		else if (result < 0)
+		{
+			result = -1;
+		}
+		return result;
 	}
 
 	const char* BSEventLoop::GetApiName()

@@ -71,6 +71,5 @@ public:
 	}
 };
 
-};
-using namespace basis;
+}
 #endif

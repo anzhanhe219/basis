@@ -35,6 +35,5 @@ private:
 	uint8 m_buffer[64];	// input buffer 
 };
 
-}using namespace basis;
-
+}
 #endif

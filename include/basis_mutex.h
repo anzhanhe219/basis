@@ -46,7 +46,5 @@ private:
 
 } //namespace basis
 
-using namespace basis;
-
 #endif //_BASIS_MUTEX_H_
 

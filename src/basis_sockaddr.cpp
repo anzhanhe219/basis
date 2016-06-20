@@ -157,6 +157,13 @@ uint32 BSSockAddr::get_ipaddr_num() const
 	return BSIpAddr::make_ipaddr_by_sockaddr(m_inaddr).to_num();
 }
 
+std::string BSSockAddr::get_addr_desc() const
+{
+	char addr[24] = {0};
+	sprintf(addr, "%s:%u", get_ipaddr_string().c_str(), get_port());
+	return addr;
+}
+
 void BSSockAddr::reset()
 {
 	memset(&m_inaddr, 0, sizeof(m_inaddr));
@@ -176,6 +183,16 @@ bool BSSockAddr::is_any() const
 bool BSSockAddr::is_error() const
 {
 	return *(BSSockAddr*)this == ErrorAddr;
+}
+
+int32 BSSockAddr::length()
+{
+	return sizeof(sockaddr_in);
+}
+
+int32 BSSockAddr::length() const
+{
+	return sizeof(sockaddr_in);
 }
 
 }//namespace basis

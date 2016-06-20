@@ -70,6 +70,5 @@ inline bool BSTimeStamp::operator <=( const BSTimeStamp& timestamp ) const
 }
 
 }
-using namespace basis;
 
 #endif // _BASIS_TIME_STAMP_H

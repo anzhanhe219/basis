@@ -48,6 +48,7 @@ public:
 	{
 	public:
 		friend class BSEventLoop;
+		friend class BSMultiplexer;
 
 	public:
 		BSFileEvent() : m_mask(ae_none), m_r_proc(NULL), m_w_proc(NULL) {}
@@ -63,6 +64,7 @@ public:
 	{
 	public:
 		friend class BSEventLoop;
+		friend class BSMultiplexer;
 
 	public:
 		BSFiredEvent() : m_fd(-1), m_mask(ae_none) {}
@@ -98,7 +100,7 @@ public:
 		void	DeleteFileEvent(int fd, int mask); 
 		int	GetFileEvent(int fd);
 
-		int Wait(int fd, int mask, long long milliseconds);
+		static int Wait(int fd, int mask, long long milliseconds);
 		const char* GetApiName();
 
 	public:
@@ -109,7 +111,7 @@ public:
 		int m_setsize;
 		int m_stop;
 
-		vector<BSFileEvent> m_events;
+		vector<BSFileEvent> m_events; // 更适用于linux; windows最好mod4,待优化?????
 		vector<BSFiredEvent> m_fired;
 		BSMultiplexer* m_multiplexer;
 	};  

@@ -46,6 +46,4 @@ private:
 
 } // namespace basis
 
-using namespace basis;
-
 #endif//__IPADDR_H__

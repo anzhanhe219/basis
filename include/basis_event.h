@@ -31,7 +31,5 @@ private:
 
 } //namespace basis
 
-using namespace basis;
-
 #endif //_BASIS_EVENT_H_
 

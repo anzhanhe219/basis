@@ -32,5 +32,4 @@ private:
 
 }
 
-using namespace basis;
 #endif

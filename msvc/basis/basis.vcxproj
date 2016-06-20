@@ -53,6 +53,8 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)d.pdb</ProgramDataBaseFileName>
+      <MinimalRebuild>false</MinimalRebuild>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -94,10 +96,12 @@ copy $(OutDir)\$(ProjectName).pdb $(ProjectDir)\..\..\lib\$(ProjectName).pdb</Co
     <ClCompile Include="..\..\src\basis_ipaddr.cpp" />
     <ClCompile Include="..\..\src\basis_json.cpp" />
     <ClCompile Include="..\..\src\basis_md5.cpp" />
+    <ClCompile Include="..\..\src\basis_multiplexer.cpp" />
     <ClCompile Include="..\..\src\basis_mutex.cpp" />
     <ClCompile Include="..\..\src\basis_rw_lock.cpp" />
     <ClCompile Include="..\..\src\basis_sockaddr.cpp" />
     <ClCompile Include="..\..\src\basis_socket.cpp" />
+    <ClCompile Include="..\..\src\basis_socket_io.cpp" />
     <ClCompile Include="..\..\src\basis_str_tool.cpp" />
     <ClCompile Include="..\..\src\basis_subject.cpp" />
     <ClCompile Include="..\..\src\basis_thread.cpp" />
@@ -130,6 +134,7 @@ copy $(OutDir)\$(ProjectName).pdb $(ProjectDir)\..\..\lib\$(ProjectName).pdb</Co
     <ClInclude Include="..\..\include\basis_smart_ptr.h" />
     <ClInclude Include="..\..\include\basis_sockaddr.h" />
     <ClInclude Include="..\..\include\basis_socket.h" />
+    <ClInclude Include="..\..\include\basis_socket_io.h" />
     <ClInclude Include="..\..\include\basis_str_tool.h" />
     <ClInclude Include="..\..\include\basis_subject.h" />
     <ClInclude Include="..\..\include\basis_sync_queue.h" />

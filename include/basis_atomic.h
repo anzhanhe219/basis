@@ -33,7 +33,5 @@ private:
 };
 } //namespace basis
 
-using namespace basis;
-
 #endif //_BASIS_ATOMIC_H_
 

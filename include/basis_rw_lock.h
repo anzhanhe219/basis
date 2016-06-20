@@ -31,7 +31,6 @@ private:
 	SysRWLock* m_lock;
 	int m_type;
 };
-
 }
-using namespace basis;
+
 #endif

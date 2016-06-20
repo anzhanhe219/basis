@@ -40,7 +40,5 @@ uint32 thread_id();
 
 } //namespace basis
 
-using namespace basis;
-
 #endif //_BASIS_THREAD_H_
 

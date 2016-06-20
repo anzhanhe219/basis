@@ -35,11 +35,14 @@ public:
 	operator const sockaddr* () const;
 	operator sockaddr_in() const;
 	operator sockaddr() const;
+	int32 length();
+	int32 length() const;
 
 public:
 	uint16 get_port() const;
 	string get_ipaddr_string() const;
 	uint32 get_ipaddr_num() const;	
+	string get_addr_desc() const;
 
 	bool is_any() const;
 	bool is_error() const;
@@ -59,7 +62,5 @@ private:
 };
 
 }//namespace basis
-
-using namespace basis;
 
 #endif//_XCORE_SOCK_ADDR_H_

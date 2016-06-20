@@ -10,17 +10,16 @@
     <Filter Include="depend">
       <UniqueIdentifier>{8a2837b2-5e20-4e89-84e7-904cfe2f0907}</UniqueIdentifier>
     </Filter>
-    <Filter Include="depend\anet">
-      <UniqueIdentifier>{550e3f62-b074-413a-84f8-3e99b17bb00d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="depend\basis">
       <UniqueIdentifier>{71cc9799-2fca-4bde-b6e4-059002e8dfb1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="depend\anet\include">
-      <UniqueIdentifier>{2de2fec5-bc28-4878-b639-7b55079d68cf}</UniqueIdentifier>
     </Filter>
     <Filter Include="depend\basis\include">
       <UniqueIdentifier>{3cb5db33-4457-4926-b219-64d7aa035d0b}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\network\src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

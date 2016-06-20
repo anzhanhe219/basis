@@ -357,7 +357,6 @@ private:
 };
 
 }
-using namespace basis;
 
 #endif // __WINDOWS__
 

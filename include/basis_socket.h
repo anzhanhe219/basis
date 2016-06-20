@@ -5,10 +5,17 @@
 #include "basis_sockaddr.h"
 #include "basis_timespan.h"
 #include "basis_ipaddr.h"
+#include "basis_nocopy.h"
 
 namespace basis
 {
-class BSSocket
+enum BSSocketType
+{
+	st_tcp = SOCK_STREAM,
+	st_udp = SOCK_DGRAM,
+};
+
+class BSSocket : public BSNoCopy
 {
 public:
 	BSSocket() : m_sock(INVALID_SOCKET) {}
@@ -19,7 +26,7 @@ public:
 	operator SOCKET ();
 	operator SOCKET () const; 
 
-	bool open(int tp);
+	bool open(BSSocketType tp);
 	bool close();
 	bool isopen();
 	
@@ -34,6 +41,9 @@ public:
 
 public:
 	bool set_nonblock(bool bl = true);
+	// Nagle?????
+	// keepalive?????
+	// reuse?????
 
 	bool set_send_bufsize(uint32 sz);
 	bool set_recv_bufsize(uint32 sz);
@@ -43,14 +53,13 @@ public:
 public:
 	int sock_error(); // 非阻塞无读写操作时 只能调用该函数获取错误码
 	int last_error();
+	int last_error() const;
 	const char* error_msg(int err);
 
 private:
 	SOCKET m_sock;
 };
 
-} // namespace xcore
-
-using namespace basis;
+} // namespace basis
 
 #endif//_XCORE_SOCKET_H_

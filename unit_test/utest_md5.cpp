@@ -3,5 +3,5 @@
 
 TEST(md5, update)
 {
-	EXPECT_EQ(MD5().update("abcd"), "E2FC714C4727EE9395F324CD2E7F331F");
+	EXPECT_EQ(basis::MD5().update("abcd"), "E2FC714C4727EE9395F324CD2E7F331F");
 }

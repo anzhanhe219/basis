@@ -9,7 +9,7 @@ BSSocket::~BSSocket()
 	close();
 }
 
-bool BSSocket::open(int tp)
+bool BSSocket::open(BSSocketType tp)
 {
 	if (m_sock != INVALID_SOCKET)
 	{
@@ -152,6 +152,20 @@ int BSSocket::last_error()
 	#ifdef __POSIX__
 	return errno;
 	#endif // __POSIX__
+
+	UNEXPECT();
+	return 0;
+}
+
+int BSSocket::last_error() const
+{
+#ifdef __WINDOWS__
+	return GetLastError();
+#endif // __WINDOWS__
+
+#ifdef __POSIX__
+	return errno;
+#endif // __POSIX__
 
 	UNEXPECT();
 	return 0;

@@ -5,28 +5,33 @@
 
 namespace basis
 {
-//////////////////////////////////////////////////////////////////////////
-// class BSMultiplexer
-// 多路复用器
-//////////////////////////////////////////////////////////////////////////
-class BSEventLoop;
-class BSMultiplexer
-{
-public:
-	BSMultiplexer();
-	~BSMultiplexer();
+	//////////////////////////////////////////////////////////////////////////
+	// class BSMultiplexer
+	// 多路复用器
+	//////////////////////////////////////////////////////////////////////////
+	class BSEventLoop;
+	class BSMultiplexer
+	{
+	public:
+		BSMultiplexer() : m_private_data(NULL) {}
+		~BSMultiplexer() { Destroy(); }
 
-	static BSMultiplexer* Create(int sz);	
-	bool Resize(int sz);
-	int AddEvent(BSEventLoop* el, int fd, int mask);
-	int DelEvent(BSEventLoop* el, int fd, int mask);
-	int Poll(BSEventLoop *el,  struct timeval *tvp);
-	const char* ApiName();
+		static BSMultiplexer* Create(int sz);
 
-private:
-	void* m_private_data;
-};
+	public:
+		bool AddEvent(BSEventLoop* el, int fd, int mask);
+		bool DelEvent(BSEventLoop* el, int fd, int mask);
+		int Poll(BSEventLoop *el,  struct timeval *tvp);
+
+		bool Resize(int sz);
+		const char* ApiName();
+
+	private:
+		void Destroy();
+
+	private:
+		void* m_private_data;
+	};
 
 }
-using namespace basis;
 #endif
