@@ -2,6 +2,7 @@
 #define _BASIS_BUFFER_H_
 
 #include "basis_define.h"
+#include "basis_nocopy.h"
 
 namespace basis
 {
@@ -9,28 +10,26 @@ namespace basis
 // class BSBuffer
 // 非线程安全
 //////////////////////////////////////////////////////////////////////////
-class BSBuffer
+class BSBuffer : public BSNoCopy
 {
 	enum { MAX_MEM = 1024 * 1024 };
 
 public:
 	BSBuffer();
 	~BSBuffer();	
-	BSBuffer(const BSBuffer& _buff);
 
+public:
 	// 内存大小
 	uint32 capatiy() const { return m_size; }
 	// 使用内存
 	uint32 use_size() const { return m_use_size; }
-
-	void reserve(uint32 _size);
-
 	// 填充数据
-	bool fill_data(const void* pData, uint32 _size);
+	bool put_data(const void* pData, uint32 _size);
 	// 提取数据
 	uint32 take_data(void* pData, uint32 _size);
 
-	BSBuffer& operator=(const BSBuffer& _buff);
+private:
+	bool reserve(uint32 _size);	
 
 private:
 	uint32 m_size; // 内存大小

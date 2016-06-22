@@ -157,20 +157,6 @@ int BSSocket::last_error()
 	return 0;
 }
 
-int BSSocket::last_error() const
-{
-#ifdef __WINDOWS__
-	return GetLastError();
-#endif // __WINDOWS__
-
-#ifdef __POSIX__
-	return errno;
-#endif // __POSIX__
-
-	UNEXPECT();
-	return 0;
-}
-
 const char* BSSocket::error_msg( int err )
 {
 	return NULL;
@@ -181,13 +167,11 @@ void BSSocket::swap( BSSocket& sock )
 	::swap(sock.m_sock, m_sock);
 }
 
-int BSSocket::sock_error()
+int BSSocket::sock_error(int fd)
 {
-	if (m_sock == INVALID_SOCKET) return 0;
-
 	int tmp_err = 0;
 	int len = sizeof(tmp_err);
-	int ret = getsockopt(m_sock, SOL_SOCKET, SO_ERROR, (char*)&tmp_err, (socklen_t *)&len);
+	int ret = getsockopt(fd, SOL_SOCKET, SO_ERROR, (char*)&tmp_err, (socklen_t *)&len);
 	ASSERT(ret == 0);
 	return tmp_err;
 }

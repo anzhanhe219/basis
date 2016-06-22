@@ -65,7 +65,7 @@ public:
 		el->DeleteFileEvent(fd, ae_writeable);
 		
 		BSSocket sock(fd);
-		int err = sock.sock_error();
+		int err = BSSocket::sock_error(sock);
 		if (err != 0)
 		{
 			return;

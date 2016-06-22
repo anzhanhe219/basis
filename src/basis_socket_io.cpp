@@ -24,7 +24,7 @@ namespace basis {
 			{
 				return -1;
 			}
-			if ((mark & ae_readable) && sock.sock_error())
+			if ((mark & ae_readable) && BSSocket::sock_error(sock))
 			{
 				return -1;
 			}

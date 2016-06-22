@@ -51,10 +51,9 @@ public:
 	bool get_recv_bufsize(uint32& sz) const;
 
 public:
-	int sock_error(); // 非阻塞无读写操作时 只能调用该函数获取错误码
-	int last_error();
-	int last_error() const;
-	const char* error_msg(int err);
+	static int sock_error(int fd); // 非阻塞无读写操作时 只能调用该函数获取错误码
+	static int last_error();
+	static const char* error_msg(int err);
 
 private:
 	SOCKET m_sock;
