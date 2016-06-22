@@ -45,6 +45,7 @@ using namespace std;
 
 #ifdef __WINDOWS__
 #ifndef _INC_WINDOWS
+#define  FD_SETSIZE 2048 // 最大select支持 
 #include <WinSock2.h>
 #endif /* _INC_WINDOWS */
 #endif//__WINDOWS__

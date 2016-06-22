@@ -8,7 +8,7 @@ namespace basis
 #ifdef __USE_IOCP__
 
 #else // use select
-#include <winsock.h>
+#include <WinSock2.h>
 #define MAX_FDSET 10240 // windows下暂定select支持最大值 
 
 	class BSWinSelectData

@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{01b24f2a-da67-4dc1-b198-c1b3c2479984}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{387c6771-b05f-44a8-a295-5cc001d0aca6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="depend">
+      <UniqueIdentifier>{8a2837b2-5e20-4e89-84e7-904cfe2f0907}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="depend\basis">
+      <UniqueIdentifier>{71cc9799-2fca-4bde-b6e4-059002e8dfb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="depend\basis\include">
+      <UniqueIdentifier>{3cb5db33-4457-4926-b219-64d7aa035d0b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\client\src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
