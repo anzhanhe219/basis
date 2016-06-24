@@ -107,6 +107,9 @@ public:
 		int	ProcessEvents();
 
 	private:
+		BSFileEvent* GetElement(int fd);
+
+	private:
 		int m_maxfd;
 		int m_setsize;
 		int m_stop;

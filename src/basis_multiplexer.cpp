@@ -8,8 +8,6 @@ namespace basis
 #ifdef __USE_IOCP__
 
 #else // use select
-#include <WinSock2.h>
-#define MAX_FDSET 10240 // windows下暂定select支持最大值 
 
 	class BSWinSelectData
 	{
@@ -22,7 +20,7 @@ namespace basis
 
 	BSMultiplexer* BSMultiplexer::Create(int sz)
 	{
-		if (sz > MAX_FDSET) return NULL;
+		if (sz > FD_SETSIZE) return NULL;
 
 		BSWinSelectData* data = new BSWinSelectData;
 		if (data == NULL) return NULL;
@@ -39,7 +37,7 @@ namespace basis
 
 	bool BSMultiplexer::Resize(int sz)
 	{
-		if (sz > MAX_FDSET) return false;
+		if (sz > FD_SETSIZE) return false;
 		return true;
 	}
 
@@ -70,7 +68,8 @@ namespace basis
 			int count = 0;
 			for (int i = 0; i <= el->m_maxfd; ++i)
 			{
-				BSFileEvent* fe = &el->m_events[i];
+				BSFileEvent* fe = el->GetElement(i);
+				if (fe == NULL) continue;
 				if (fe->m_mask == ae_none) continue;
 				
 				int mark = ae_none;

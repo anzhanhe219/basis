@@ -69,12 +69,18 @@ namespace basis
 	{
 		if (proc == NULL) return false;
 		if (fd >= m_setsize) return false;
-		
+
+		BSFileEvent* fe = GetElement(fd);
+		if (fe == NULL)
+		{
+			return false;
+		}
+
 		if (!m_multiplexer->AddEvent(this, fd, mask))
 		{
 			return false;
 		}
-		BSFileEvent* fe = &m_events[fd];
+
 		fe->m_mask |= mask;
 		if (mask & ae_readable)
 		{
@@ -92,7 +98,9 @@ namespace basis
 	void BSEventLoop::DeleteFileEvent(int fd, int mask)
 	{
 		if (fd > m_maxfd) return;
-		BSFileEvent *fe = &m_events[fd];
+
+		BSFileEvent *fe = GetElement(fd);
+		if (fe == NULL) return;		
 		if (fe->m_mask == ae_none)  return;
 
 		fe->m_mask &= ~mask;
@@ -100,7 +108,7 @@ namespace basis
 		{
 			int t_max = m_maxfd-1;
 			for ( ; t_max >= 0 ; --t_max)
-				if (m_events[t_max].m_mask != ae_none) break;
+				if ((fe = GetElement(t_max)) && (fe->m_mask != ae_none)) break;
 			m_maxfd = t_max;
 		}
 
@@ -109,8 +117,11 @@ namespace basis
 
 	int BSEventLoop::GetFileEvent(int fd)
 	{
-		if (fd >= m_maxfd) return ae_none;
-		return m_events[fd].m_mask;
+		if (BSFileEvent *fe = GetElement(fd))
+		{
+			return fe->m_mask;
+		}
+		return ae_none;
 	}
 
 	int BSEventLoop::Wait(int fd, int mask, long long milliseconds)
@@ -167,7 +178,10 @@ namespace basis
 		for (int i = 0; i < count; ++i)
 		{
 			BSFiredEvent* fr = &m_fired[i];
-			BSFileEvent* fe = &m_events[fr->m_fd];
+			BSFileEvent* fe = GetElement(fr->m_fd);
+			CHECKPTR(fe);
+			if (fe == NULL) continue;
+
 			// 先处理读事件 再处理写事件  同时有读写并且回调函数一样的只执行一个
 			bool p_flag = false;
 			if (fe->m_mask & fr->m_mask & ae_readable)
@@ -183,6 +197,23 @@ namespace basis
 			}
 		}
 		return count;		
+	}
+
+	BSFileEvent* BSEventLoop::GetElement(int fd)
+	{
+#ifdef __WINDOWS__
+		int mod = fd % 4;
+		if (mod != 0) return NULL;
+		if (mod >= (int)m_events.size()) return NULL;
+		return &m_events[mod];
+#endif //__WINDOWS__
+
+#ifdef __POSIX__
+		if (fd >= (int)m_events.size()) return NULL;
+		return &m_events[fd];
+#endif // __POSIX__
+
+		return NULL;
 	}
 
 }
