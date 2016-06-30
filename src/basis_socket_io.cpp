@@ -19,16 +19,16 @@ namespace basis {
 		int last_err = sock.last_error();
 		if (last_err == EINPROGRESS || last_err == EWOULDBLOCK)
 		{
-			int mark = BSEventLoop::Wait(sock, ae_readable|ae_writeable, ms);
+			int mark = BSEventLoop::Wait(sock, fs_readable|fs_writeable, ms);
 			if (mark <= 0)
 			{
 				return -1;
 			}
-			if ((mark & ae_readable) && BSSocket::sock_error(sock))
+			if ((mark & fs_readable) && BSSocket::sock_error(sock))
 			{
 				return -1;
 			}
-			if (mark & ae_writeable)
+			if (mark & fs_writeable)
 			{
 				sock.set_nonblock(false);
 				return sock.detach();

@@ -28,21 +28,19 @@ namespace basis {
 		void SetConnctedCallBack(BSWriteableCallBack* connected_cb) { m_connected_proc = connected_cb; }
 
 	public:
-		bool RegisterAcceptEvent(int fd,  BSFileEvent* arg);
-		bool RegisterConnectedEvent(int fd, BSFileEvent* arg);
-		bool RegisterReadEvent(int fd, BSFileEvent* arg);
-		bool RegisterWriteEvent(int fd, BSFileEvent* arg);
+		bool RegisterAcceptEvent(int fd,  BSFdPartner* partner);
+		bool RegisterConnectedEvent(int fd, BSFdPartner* partner);
+		bool RegisterReadEvent(int fd, BSFdPartner* partner);
+		bool RegisterWriteEvent(int fd, BSFdPartner* partner);
 
-		void UnregisterAcceptEvent(int fd, BSFileEvent* arg);
-		void UnregisterConnectedEvent(int fd, BSFileEvent* arg);
-		void UnregisterReadEvent(int fd, BSFileEvent* arg);
-		void UnregisterWriteEvent(int fd, BSFileEvent* arg);
+		void UnregisterAcceptEvent(int fd, BSFdPartner* partner);
+		void UnregisterConnectedEvent(int fd, BSFdPartner* partner);
+		void UnregisterReadEvent(int fd, BSFdPartner* partner);
+		void UnregisterWriteEvent(int fd, BSFdPartner* partner);
 
 	public:
 		void RunLoop();
 		void SetStop();
-
-		bool ResizeSetSize(int setsize);
 
 		static int Wait(int fd, int mask, long long milliseconds);
 		const char* GetApiName();

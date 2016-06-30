@@ -46,21 +46,16 @@ namespace basis
 		m_stop = 1;
 	}
 
-	bool BSEventLoop::ResizeSetSize(int setsize)
-	{
-		return m_multiplexer->Resize(setsize);
-	}
-
 	int BSEventLoop::Wait(int fd, int mask, long long milliseconds)
 	{
 		FD_SET r_set, w_set;
 		FD_ZERO(&r_set);
 		FD_ZERO(&w_set);
-		if (mask & ae_readable)
+		if (mask & fs_readable)
 		{
 			FD_SET(fd, &r_set);
 		}
-		if (mask & ae_writeable)
+		if (mask & fs_writeable)
 		{
 			FD_SET(fd, &w_set);
 		}
@@ -78,11 +73,11 @@ namespace basis
 			result = 0;
 			if (FD_ISSET(fd, &r_set))
 			{
-				result |= ae_readable;
+				result |= fs_readable;
 			}
 			if (FD_ISSET(fd, &w_set))
 			{
-				result |= ae_writeable;
+				result |= fs_writeable;
 			}
 		}
 		else if (result < 0)
@@ -102,40 +97,40 @@ namespace basis
 		int count = m_multiplexer->Poll(this, NULL);
 		for (int i = 0; i < count; ++i)
 		{
-			BSFiredEvent* fr = m_multiplexer->GetFiredEvents((uint32)i);
+			BSFiredFd* fr = m_multiplexer->GetFiredFd((uint32)i);
 			CHECKPTR(fr);
-			BSFileEvent* fe = fr->m_file_event;
-			CHECKPTR(fe);
+			BSFdPartner* fp = fr->m_partner;
+			CHECKPTR(fp);
 
 			// accept处理
-			if ((fe->m_mask & ae_accept_fd) && (fr->m_mask & ae_readable))
+			if ((fp->m_logic_mask & fl_accept) && (fr->m_state_mask & fs_readable))
 			{
 				if (m_accept_proc == NULL) UNEXPECT();
-				m_accept_proc->onReadable(this, fr->m_fd, fe);
+				m_accept_proc->onReadable(this, fr->m_fd, fp);
 				continue;
 			}
 
 			// connected处理
-			if ((fe->m_mask & ae_connet_fd) && (fr->m_mask & ae_writeable))
+			if ((fp->m_logic_mask & fl_connet) && (fr->m_state_mask & fs_writeable))
 			{
 				if (m_connected_proc == NULL) UNEXPECT();
-				m_connected_proc->onWriteable(this, fr->m_fd, fe);
+				m_connected_proc->onWriteable(this, fr->m_fd, fp);
 				continue;
 			}
 
 			bool proccess_flag = false;
 			// readable处理
-			if ((fe->m_mask & ae_read_fd) && (fr->m_mask & ae_readable))
+			if ((fp->m_logic_mask & fl_read) && (fr->m_state_mask & fs_readable))
 			{
 				if (m_read_proc == NULL) UNEXPECT();
-				m_read_proc->onReadable(this, fr->m_fd, fe);
+				m_read_proc->onReadable(this, fr->m_fd, fp);
 				proccess_flag = true;
 			}
 			// writeable处理
-			if ((fe->m_mask & ae_write_fd) && (fr->m_mask & ae_writeable))
+			if ((fp->m_logic_mask & fl_write) && (fr->m_state_mask & fs_writeable))
 			{
 				if (m_write_proc == NULL) UNEXPECT();
-				m_write_proc->onWriteable(this, fr->m_fd, fe);
+				m_write_proc->onWriteable(this, fr->m_fd, fp);
 				proccess_flag = true;
 			}
 			if (proccess_flag) continue;
@@ -144,79 +139,79 @@ namespace basis
 		return count;		
 	}
 
-	bool BSEventLoop::RegisterAcceptEvent(int fd, BSFileEvent* arg)
+	bool BSEventLoop::RegisterAcceptEvent(int fd, BSFdPartner* partner)
 	{
-		if (arg == NULL) return false;
+		if (partner == NULL) return false;
 		if (m_accept_proc == NULL) return false;
-		if (arg->m_mask != ae_empty_fd) return false;
-		if (!m_multiplexer->AddEvent(fd, ae_readable, arg)) return false;
-		arg->m_mask |= ae_accept_fd;
+		if (partner->m_logic_mask != fl_empty) return false;
+		if (!m_multiplexer->AddEvent(fd, fs_readable, partner)) return false;
+		partner->m_logic_mask |= fl_accept;
 		return true;
 	}
 
-	bool BSEventLoop::RegisterConnectedEvent(int fd, BSFileEvent* arg)
+	bool BSEventLoop::RegisterConnectedEvent(int fd, BSFdPartner* partner)
 	{
-		if (arg == NULL) return false;
+		if (partner == NULL) return false;
 		if (m_connected_proc == NULL) return false;
-		if (arg->m_mask != ae_empty_fd) return false; 
-		if (!m_multiplexer->AddEvent(fd, ae_writeable, arg)) return false;
-		arg->m_mask |= ae_connet_fd;
+		if (partner->m_logic_mask != fl_empty) return false; 
+		if (!m_multiplexer->AddEvent(fd, fs_writeable, partner)) return false;
+		partner->m_logic_mask |= fl_connet;
 		return true;
 	}
 
-	bool BSEventLoop::RegisterReadEvent(int fd, BSFileEvent* arg)
+	bool BSEventLoop::RegisterReadEvent(int fd, BSFdPartner* partner)
 	{
-		if (arg == NULL)  return false;
+		if (partner == NULL)  return false;
 		if (m_read_proc == NULL) return false;
-		if (arg->m_mask & (ae_connet_fd|ae_accept_fd)) return false; 
-		if (!m_multiplexer->AddEvent(fd, ae_readable, arg)) return false;
-		arg->m_mask |= ae_read_fd;
+		if (partner->m_logic_mask & (fl_connet|fl_accept)) return false; 
+		if (!m_multiplexer->AddEvent(fd, fs_readable, partner)) return false;
+		partner->m_logic_mask |= fl_read;
 		return true;
 	}
 
-	bool BSEventLoop::RegisterWriteEvent(int fd, BSFileEvent* arg)
+	bool BSEventLoop::RegisterWriteEvent(int fd, BSFdPartner* partner)
 	{
-		if (arg == NULL)  return false;
+		if (partner == NULL)  return false;
 		if (m_read_proc == NULL) return false;
-		if (arg->m_mask & (ae_connet_fd|ae_accept_fd)) return false; 
-		if (!m_multiplexer->AddEvent(fd, ae_writeable, arg)) return false;
-		arg->m_mask |= ae_write_fd;
+		if (partner->m_logic_mask & (fl_connet|fl_accept)) return false; 
+		if (!m_multiplexer->AddEvent(fd, fs_writeable, partner)) return false;
+		partner->m_logic_mask |= fl_write;
 		return true;
 	}
 
-	void BSEventLoop::UnregisterAcceptEvent(int fd, BSFileEvent* arg)
+	void BSEventLoop::UnregisterAcceptEvent(int fd, BSFdPartner* partner)
 	{
-		if (arg == NULL) return;
-		ASSERT(arg->m_mask == ae_accept_fd);
-		arg->m_mask = ae_empty_fd;
-		m_multiplexer->DelEvent(fd, ae_readable, arg);
+		if (partner == NULL) return;
+		ASSERT(partner->m_logic_mask == fl_accept);
+		partner->m_logic_mask = fl_empty;
+		m_multiplexer->DelEvent(fd, fs_readable, partner);
 		return;
 	}
 
-	void BSEventLoop::UnregisterConnectedEvent(int fd, BSFileEvent* arg)
+	void BSEventLoop::UnregisterConnectedEvent(int fd, BSFdPartner* partner)
 	{
-		if (arg == NULL) return;
-		ASSERT(arg->m_mask == ae_connet_fd);
-		arg->m_mask = ae_empty_fd;
-		m_multiplexer->DelEvent(fd, ae_writeable, arg);
+		if (partner == NULL) return;
+		ASSERT(partner->m_logic_mask == fl_connet);
+		partner->m_logic_mask = fl_empty;
+		m_multiplexer->DelEvent(fd, fs_writeable, partner);
 		return;
 	}
 
-	void BSEventLoop::UnregisterReadEvent(int fd, BSFileEvent* arg)
+	void BSEventLoop::UnregisterReadEvent(int fd, BSFdPartner* partner)
 	{
-		if (arg == NULL) return;
-		ASSERT(arg->m_mask & ae_read_fd);
-		arg->m_mask &= ~ae_read_fd;
-		m_multiplexer->DelEvent(fd, ae_readable, arg);
+		if (partner == NULL) return;
+		ASSERT(partner->m_logic_mask & fl_read);
+		partner->m_logic_mask &= ~fl_read;
+		m_multiplexer->DelEvent(fd, fs_readable, partner);
 		return;
 	}
 
-	void BSEventLoop::UnregisterWriteEvent(int fd, BSFileEvent* arg)
+	void BSEventLoop::UnregisterWriteEvent(int fd, BSFdPartner* partner)
 	{
-		if (arg == NULL) return;
-		ASSERT(arg->m_mask & ae_write_fd);
-		arg->m_mask &= ~ae_write_fd;
-		m_multiplexer->DelEvent(fd, ae_writeable, arg);
+		if (partner == NULL) return;
+		ASSERT(partner->m_logic_mask & fl_write);
+		partner->m_logic_mask &= ~fl_write;
+		m_multiplexer->DelEvent(fd, fs_writeable, partner);
 		return;
 	}
 

@@ -17,23 +17,16 @@ namespace basis
 		FD_SET m_arg_r_set;
 		FD_SET m_arg_w_set;
 
+	public:
 		uint32 m_curr_index;
-		vector<BSFiredEvent> m_fired_events;
-		map<int, BSFileEvent*> m_file_events;
+		vector<BSFiredFd> m_fired_fds;
+		map<int, BSFdPartner*> m_partners;
 
 	public:
 		int max_fd()
 		{
-			if (m_file_events.empty())
-			{
-				return 0;
-			}
-			return m_file_events.rbegin()->first;
-		}
-
-		BSFileEvent* get_file_event(int fd)
-		{
-			return NULL;
+			if (m_partners.empty()) return 0;
+			return m_partners.rbegin()->first;
 		}
 	};
 
@@ -47,7 +40,7 @@ namespace basis
 		{
 			FD_ZERO(&data->m_r_set);
 			FD_ZERO(&data->m_w_set);
-			data->m_fired_events.reserve(sz);
+			data->m_fired_fds.reserve(sz);
 			data->m_curr_index = 0;			
 			mlp->m_private_data = data;			
 			return mlp;
@@ -56,41 +49,42 @@ namespace basis
 		return NULL;
 	}
 
-	bool BSMultiplexer::Resize(int sz)
+	bool BSMultiplexer::AddEvent(int fd, int mask, BSFdPartner* partner)
 	{
-		if (sz > FD_SETSIZE) return false;
-		return true;
-	}
-
-	bool BSMultiplexer::AddEvent(int fd, int mask, BSFileEvent* arg)
-	{
-		if (mask == ae_none) return false;
-		if (arg == NULL) return false;
+		if (mask == fs_none) return false;
+		if (partner == NULL) return false;
 		BSWinSelectData* data = (BSWinSelectData*)m_private_data;
-		if (data->m_file_events.size() >= FD_SETSIZE) return false;
-		if (mask & ae_readable)	FD_SET(fd, &data->m_r_set);
-		if (mask & ae_writeable) FD_SET(fd, &data->m_w_set);
-		if (data->m_file_events.find(fd) == data->m_file_events.end())
+		if (data->m_partners.size() >= FD_SETSIZE) return false;
+		if (mask & fs_readable)	FD_SET(fd, &data->m_r_set);
+		if (mask & fs_writeable) FD_SET(fd, &data->m_w_set);
+
+		map<int, BSFdPartner*>::iterator it = data->m_partners.find(fd);
+		if (it == data->m_partners.end())
 		{
-			data->m_file_events[fd] = arg;
+			data->m_partners[fd] = partner;
+		}
+		else
+		{
+			ASSERT(it->second ==partner);
 		}
 		return true;
 	}
 
-	bool BSMultiplexer::DelEvent(int fd, int mask, BSFileEvent* arg)
+	bool BSMultiplexer::DelEvent(int fd, int mask, BSFdPartner* partner)
 	{
-		if (mask == ae_none) return false;
-		if (arg == NULL) return false;
+		if (mask == fs_none) return false;
+		if (partner == NULL) return false;
 		BSWinSelectData* data = (BSWinSelectData*)m_private_data;
-		if (mask & ae_readable)	FD_CLR(fd, &data->m_r_set);
-		if (mask & ae_writeable) FD_CLR(fd, &data->m_w_set);
-		if (arg->m_mask == ae_empty_fd)
+		if (mask & fs_readable)	FD_CLR(fd, &data->m_r_set);
+		if (mask & fs_writeable) FD_CLR(fd, &data->m_w_set);
+
+		if (partner->m_logic_mask == fl_empty)
 		{
-			map<int, BSFileEvent*>::iterator it;
-			it = data->m_file_events.find(fd);
-			if (it != data->m_file_events.end())
+			map<int, BSFdPartner*>::iterator it;
+			it = data->m_partners.find(fd);
+			if (it != data->m_partners.end())
 			{
-				data->m_file_events.erase(it);
+				data->m_partners.erase(it);
 			}
 		}
 		return true;
@@ -99,35 +93,35 @@ namespace basis
 	int BSMultiplexer::Poll(BSEventLoop *el,  struct timeval *tvp)
 	{
 		BSWinSelectData* data = (BSWinSelectData*)m_private_data;
-		data->m_curr_index = 0;
-		data->m_fired_events.clear();
 		memcpy(&data->m_arg_r_set,  &data->m_r_set, sizeof(data->m_r_set));
 		memcpy(&data->m_arg_w_set,  &data->m_w_set, sizeof(data->m_w_set));
 		int nret = ::select(data->max_fd()+1, &data->m_arg_r_set, &data->m_arg_w_set, NULL, tvp);
 		if (nret > 0)
 		{
 			int count = 0;
-			map<int, BSFileEvent*>::iterator it = data->m_file_events.begin();
-			for (; it != data->m_file_events.end(); ++it)
+			data->m_curr_index = 0;
+			data->m_partners.clear();			
+			map<int, BSFdPartner*>::iterator it = data->m_partners.begin();
+			for (; it != data->m_partners.end(); ++it)
 			{
 				int fd = it->first;
-				BSFileEvent* fe = it->second;
+				BSFdPartner* fp = it->second;
 
-				if (fe == NULL) continue;
-				if (fe->m_mask == ae_none) continue;
+				if (fp == NULL) continue;
+				if (fp->m_logic_mask == fl_empty) continue;
 				
-				int mark = ae_none;
+				int mark = fs_none;
 				if (FD_ISSET(fd, &data->m_arg_r_set))
-					mark |= ae_readable;
+					mark |= fs_readable;
 				if (FD_ISSET(fd, &data->m_arg_w_set))
-					mark |= ae_writeable;
-				if (mark == ae_none) continue;
+					mark |= fs_writeable;
+				if (mark == fs_none) continue;
 				
-				BSFiredEvent fr;
+				BSFiredFd fr;
 				fr.m_fd = fd;
-				fr.m_mask = mark;
-				fr.m_file_event = fe;
-				data->m_fired_events.push_back(fr);
+				fr.m_partner = fp;
+				fr.m_state_mask = mark;
+				data->m_fired_fds.push_back(fr);
 				count++;
 			}
 			return count;
@@ -142,18 +136,18 @@ namespace basis
 		return 0;		
 	}
 
-	BSFiredEvent* BSMultiplexer::FetchFiredEvents()
+	BSFiredFd* BSMultiplexer::FetchFiredFd()
 	{
 		BSWinSelectData* data = (BSWinSelectData*)m_private_data;
-		if (data->m_curr_index >= data->m_fired_events.size()) return NULL;		
-		return &data->m_fired_events[data->m_curr_index++];
+		if (data->m_curr_index >= data->m_fired_fds.size()) return NULL;		
+		return &data->m_fired_fds[data->m_curr_index++];
 	}
 
-	BSFiredEvent* BSMultiplexer::GetFiredEvents(uint32 index)
+	BSFiredFd* BSMultiplexer::GetFiredFd(uint32 index)
 	{
 		BSWinSelectData* data = (BSWinSelectData*)m_private_data;
-		if (index >= data->m_fired_events.size()) return NULL;		
-		return &data->m_fired_events[index];
+		if (index >= data->m_fired_fds.size()) return NULL;		
+		return &data->m_fired_fds[index];
 	}
 
 	void BSMultiplexer::Destroy()
@@ -174,6 +168,7 @@ namespace basis
 
 #else
 #ifdef __USE_POLL__
+
 
 #else // use select
 

@@ -7,18 +7,56 @@ namespace basis
 {
 	enum FdState
 	{
-		ae_none = 0x00,
-		ae_readable = 0x01,
-		ae_writeable = 0x02,
+		fs_none = 0x00,
+		fs_readable = 0x01,
+		fs_writeable = 0x02,
 	};
 
-	enum FdLogicType
+	enum FdLogic
 	{
-		ae_empty_fd = 0x0000,
-		ae_accept_fd = 0x0001,
-		ae_read_fd = 0x0002,
-		ae_write_fd = 0x0004,
-		ae_connet_fd = 0x0008,
+		fl_empty = 0x0000,
+		fl_accept = 0x0001,
+		fl_read = 0x0002,
+		fl_write = 0x0004,
+		fl_connet = 0x0008,
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+	// class BSFdPartner
+	// 描述符配套
+	//////////////////////////////////////////////////////////////////////////
+	class BSFdPartner 
+	{
+	public:
+		friend class BSEventLoop;
+		friend class BSMultiplexer;
+
+	public:
+		BSFdPartner() : m_logic_mask(fl_empty), m_arg(NULL) {}
+		virtual ~BSFdPartner() {}
+
+		void SetArg(void* arg) { m_arg = arg; }
+		void* GetArg() { return m_arg; }
+
+	private:
+		int m_logic_mask; // FdLogicType
+		void* m_arg;
+	};
+
+	class BSFiredFd
+	{
+	public:
+		friend class BSEventLoop;
+		friend class BSMultiplexer;
+
+	public:
+		BSFiredFd() : m_fd(-1), m_state_mask(fs_none), m_partner(NULL) {}
+		~BSFiredFd() {}
+
+	private:
+		int m_fd;
+		int m_state_mask; // FdState
+		BSFdPartner* m_partner;
 	};
 
 //////////////////////////////////////////////////////////////////////////
@@ -31,13 +69,13 @@ class BSEventCallBack {};
 class BSReadableCallBack : public BSEventCallBack
 {
 public:
-	virtual void onReadable(BSEventLoop *el, int fd, void* arg) = 0;
+	virtual void onReadable(BSEventLoop *el, int fd, BSFdPartner* arg) = 0;
 };
 
 class BSWriteableCallBack : public BSEventCallBack
 {
 public:
-	virtual void onWriteable(BSEventLoop *el, int fd, void* arg) = 0;
+	virtual void onWriteable(BSEventLoop *el, int fd, BSFdPartner* arg) = 0;
 };
 
 class BSTimerCallBack
@@ -47,39 +85,5 @@ public:
 	virtual void onFinalizer(BSEventLoop *el, long long id) = 0;
 };
 
-//////////////////////////////////////////////////////////////////////////
-// class BSEventDefine
-// 事件类型定义
-//////////////////////////////////////////////////////////////////////////
-	class BSFileEvent 
-	{
-	public:
-		friend class BSEventLoop;
-		friend class BSMultiplexer;
-
-	public:
-		BSFileEvent() : m_mask(ae_none), m_arg(NULL){}
-		~BSFileEvent() {}
-
-	private:
-		int m_mask; 
-		void* m_arg;
-	};
-
-	class BSFiredEvent
-	{
-	public:
-		friend class BSEventLoop;
-		friend class BSMultiplexer;
-
-	public:
-		BSFiredEvent() : m_fd(-1), m_mask(ae_none), m_file_event(NULL) {}
-		~BSFiredEvent() {}
-
-	private:
-		int m_fd;
-		int m_mask;
-		BSFileEvent* m_file_event;
-	};
 }
 #endif

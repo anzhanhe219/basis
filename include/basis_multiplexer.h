@@ -20,14 +20,13 @@ namespace basis
 		static BSMultiplexer* Create(int sz);
 
 	public:
-		bool AddEvent(int fd, int mask, BSFileEvent* arg);
-		bool DelEvent(int fd, int mask, BSFileEvent* arg);
+		bool AddEvent(int fd, int mask, BSFdPartner* partner);
+		bool DelEvent(int fd, int mask, BSFdPartner* partner);
 		int Poll(BSEventLoop *el,  struct timeval *tvp);
 
-		BSFiredEvent* FetchFiredEvents();
-		BSFiredEvent* GetFiredEvents(uint32 index);
+		BSFiredFd* FetchFiredFd();
+		BSFiredFd* GetFiredFd(uint32 index);
 
-		bool Resize(int sz);
 		const char* ApiName();
 
 	private:

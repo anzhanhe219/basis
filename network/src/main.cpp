@@ -11,14 +11,14 @@ static int32 the_count = 0;
 class WriteableCbk : public BSWriteableCallBack
 {
 public:
-	virtual void onWriteable(BSEventLoop *el, int fd, void* arg)
+	virtual void onWriteable(BSEventLoop *el, int fd, BSFdPartner* partner)
 	{
 		if (BSSocketIO::write(fd, "abcd", 4) <= 0)
 		{
 			printf("write error\n");
 		}
 		//printf("send %d abcd.\n", fd);
-		el->UnregisterWriteEvent(fd, (BSFileEvent*)arg);
+		el->UnregisterWriteEvent(fd, partner);
 		if (++the_count % 10000 == 0)
 		{
 			printf("process %d the timestamp is %u.\n", the_count, (uint32)time(0));
@@ -29,19 +29,19 @@ public:
 class ReadableCbk : public BSReadableCallBack
 {
 public:
-	virtual void onReadable(BSEventLoop *el, int fd, void* arg)
+	virtual void onReadable(BSEventLoop *el, int fd, BSFdPartner* partner)
 	{
 		char buff[1024] = {0};
 		int result = BSSocketIO::read(fd, buff, 1024);
 		if (result <= 0)
 		{
-			el->UnregisterReadEvent(fd, (BSFileEvent*)arg);
+			el->UnregisterReadEvent(fd, partner);
 			printf("socket %d is closed.\n", fd);
 			return;
 		}
 		buff[result] = 0;
 		//printf("recv remote(%d), buff(%s).\n", fd, buff);
-		el->RegisterWriteEvent(fd, (BSFileEvent*)arg);
+		el->RegisterWriteEvent(fd, partner);
 		return;
 	}
 };
@@ -49,7 +49,7 @@ public:
 class AcceptableCbk : public BSReadableCallBack
 {
 public:
-	virtual void onReadable(BSEventLoop *el, int fd, void* arg)
+	virtual void onReadable(BSEventLoop *el, int fd, BSFdPartner* partner)
 	{
 		vector<int> sockets;
 		sockets.reserve(5);
@@ -61,7 +61,7 @@ public:
 		}
 		for (uint32 i = 0; i < sockets.size(); ++i)
 		{
-			BSFileEvent* fe = new BSFileEvent;
+			BSFdPartner* fe = new BSFdPartner;
 			el->RegisterReadEvent(sockets[i], fe);
 			//printf("accept %d.\n", sockets[i]);
 		}
@@ -92,13 +92,10 @@ int main()
 		el->SetReadableCallBack(&readable_cbk);
 		el->SetWriteableCallBack(&writeable_cbk);
 
-		BSFileEvent* fe = new BSFileEvent;
+		BSFdPartner* fe = new BSFdPartner;
 		el->RegisterAcceptEvent(sock.detach(), fe);
 
 		el->RunLoop();
 	}
-
-
-
 	return 0;
 }
