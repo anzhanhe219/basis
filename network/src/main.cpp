@@ -8,53 +8,48 @@ using namespace basis;
 static int32 the_count = 0;
 
 // can write
-class CBK3 : public BSWriteableCallBack
+class WriteableCbk : public BSWriteableCallBack
 {
 public:
-	virtual void onWriteable(BSEventLoop *el, int fd)
+	virtual void onWriteable(BSEventLoop *el, int fd, void* arg)
 	{
 		if (BSSocketIO::write(fd, "abcd", 4) <= 0)
 		{
 			printf("write error\n");
 		}
-		el->DeleteFileEvent(fd, ae_writeable);
+		//printf("send %d abcd.\n", fd);
+		el->UnregisterWriteEvent(fd, (BSFileEvent*)arg);
 		if (++the_count % 10000 == 0)
 		{
 			printf("process %d the timestamp is %u.\n", the_count, (uint32)time(0));
 		}
 	}
-
-	static CBK3 m_instance;
 };
-CBK3 CBK3::m_instance;
 
-class CBK2 : public BSReadableCallBack
+class ReadableCbk : public BSReadableCallBack
 {
 public:
-	virtual void onReadable(BSEventLoop *el, int fd)
+	virtual void onReadable(BSEventLoop *el, int fd, void* arg)
 	{
 		char buff[1024] = {0};
 		int result = BSSocketIO::read(fd, buff, 1024);
 		if (result <= 0)
 		{
-			el->DeleteFileEvent(fd, ae_readable);
+			el->UnregisterReadEvent(fd, (BSFileEvent*)arg);
 			printf("socket %d is closed.\n", fd);
 			return;
 		}
 		buff[result] = 0;
 		//printf("recv remote(%d), buff(%s).\n", fd, buff);
-		el->CreateFileEvent(fd, ae_writeable, &CBK3::m_instance);
+		el->RegisterWriteEvent(fd, (BSFileEvent*)arg);
 		return;
 	}
-
-	static CBK2 m_instance;
 };
-CBK2 CBK2::m_instance;
 
-class CBK1 : public BSReadableCallBack
+class AcceptableCbk : public BSReadableCallBack
 {
 public:
-	virtual void onReadable(BSEventLoop *el, int fd)
+	virtual void onReadable(BSEventLoop *el, int fd, void* arg)
 	{
 		vector<int> sockets;
 		sockets.reserve(5);
@@ -66,33 +61,12 @@ public:
 		}
 		for (uint32 i = 0; i < sockets.size(); ++i)
 		{
-			el->CreateFileEvent(sockets[i], ae_readable, &CBK2::m_instance);
+			BSFileEvent* fe = new BSFileEvent;
+			el->RegisterReadEvent(sockets[i], fe);
+			//printf("accept %d.\n", sockets[i]);
 		}
 	}
 };
-
-// connect success
-class CBK4 : public BSWriteableCallBack
-{
-public:
-	virtual void onWriteable(BSEventLoop *el, int fd)
-	{
-		el->DeleteFileEvent(fd, ae_writeable);
-		
-		BSSocket sock(fd);
-		int err = BSSocket::sock_error(sock);
-		if (err != 0)
-		{
-			return;
-		}
-		
-		el->CreateFileEvent(fd, ae_readable, &CBK2::m_instance);
-		sock.detach();
-	}
-
-	static CBK4 m_instance;
-};
-CBK4 CBK4::m_instance;
 
 int main()
 {
@@ -105,30 +79,25 @@ int main()
 		printf("listen error\n");
 		return -1;
 	}
+	printf("listen success.\n");
 
-	CBK1* c = new CBK1();
 	BSEventLoop* el = BSEventLoop::CreateEventLoop(2000);
 	if (el)
 	{
-		el->CreateFileEvent(sock, ae_readable, c);
+		AcceptableCbk accept_cbk;
+		ReadableCbk readable_cbk;
+		WriteableCbk writeable_cbk;
+
+		el->SetAcceptCallBack(&accept_cbk);
+		el->SetReadableCallBack(&readable_cbk);
+		el->SetWriteableCallBack(&writeable_cbk);
+
+		BSFileEvent* fe = new BSFileEvent;
+		el->RegisterAcceptEvent(sock.detach(), fe);
+
 		el->RunLoop();
 	}
 
-	////client
-	//BSSockAddr addr = BSSockAddr::make_sock_addr("127.0.0.1", 8899);
-	//BSEventLoop* el = BSEventLoop::CreateEventLoop(2000);
-	//bool is_success = false;
-	//int fd = BSSocketIO::connect_asyn(addr, is_success);
-	//if (fd > 0 && is_success)
-	//{
-	//	// 连接成功?????
-	//	el->CreateFileEvent(fd, ae_readable, &CBK2::m_instance);
-	//}
-	//else if(fd > 0)
-	//{
-	//	 	el->CreateFileEvent(fd, ae_writeable, &CBK4::m_instance);
-	//}
-	//el->RunLoop();
 
 
 	return 0;

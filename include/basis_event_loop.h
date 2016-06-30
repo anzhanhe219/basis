@@ -3,77 +3,10 @@
 
 #include "basis_define.h"
 #include "basis_nocopy.h"
+#include "basis_event_callback.h"
 #include "basis_multiplexer.h"
 
-namespace basis
-{
-	enum aeFdState
-	{
-		ae_none = 0,
-		ae_readable = 1,
-		ae_writeable = 2,
-	};
-
-//////////////////////////////////////////////////////////////////////////
-// class BSEventCallBack
-// 事件回调
-//////////////////////////////////////////////////////////////////////////
-class BSEventLoop;
-class BSEventCallBack {};
-
-class BSReadableCallBack : public BSEventCallBack
-{
-public:
-	virtual void onReadable(BSEventLoop *el, int fd) = 0;
-};
-
-class BSWriteableCallBack : public BSEventCallBack
-{
-public:
-	virtual void onWriteable(BSEventLoop *el, int fd) = 0;
-};
-
-class BSTimerCallBack
-{
-public:
-	virtual int   onTimeOut(BSEventLoop *el, long long id) = 0;
-	virtual void onFinalizer(BSEventLoop *el, long long id) = 0;
-};
-
-//////////////////////////////////////////////////////////////////////////
-// class BSEventDefine
-// 事件类型定义
-//////////////////////////////////////////////////////////////////////////
-	class BSFileEvent 
-	{
-	public:
-		friend class BSEventLoop;
-		friend class BSMultiplexer;
-
-	public:
-		BSFileEvent() : m_mask(ae_none), m_r_proc(NULL), m_w_proc(NULL) {}
-		~BSFileEvent() {}
-
-	private:
-		int m_mask; 
-		BSReadableCallBack* m_r_proc;
-		BSWriteableCallBack* m_w_proc;
-	};
-
-	class BSFiredEvent
-	{
-	public:
-		friend class BSEventLoop;
-		friend class BSMultiplexer;
-
-	public:
-		BSFiredEvent() : m_fd(-1), m_mask(ae_none) {}
-		~BSFiredEvent() {}
-
-	private:
-		int m_fd;
-		int m_mask;
-	};
+namespace basis {
 
 	//////////////////////////////////////////////////////////////////////////
 	// class BSEventLoop
@@ -85,20 +18,31 @@ public:
 		friend class BSMultiplexer;
 
 	public:
-		BSEventLoop();
 		~BSEventLoop();
 		static BSEventLoop* CreateEventLoop(int setsize);
-	
+
+	public:
+		void SetAcceptCallBack(BSReadableCallBack* accept_cb) { m_accept_proc = accept_cb; }
+		void SetReadableCallBack(BSReadableCallBack* read_cb) { m_read_proc = read_cb; }
+		void SetWriteableCallBack(BSWriteableCallBack* write_cb) { m_write_proc = write_cb; }
+		void SetConnctedCallBack(BSWriteableCallBack* connected_cb) { m_connected_proc = connected_cb; }
+
+	public:
+		bool RegisterAcceptEvent(int fd,  BSFileEvent* arg);
+		bool RegisterConnectedEvent(int fd, BSFileEvent* arg);
+		bool RegisterReadEvent(int fd, BSFileEvent* arg);
+		bool RegisterWriteEvent(int fd, BSFileEvent* arg);
+
+		void UnregisterAcceptEvent(int fd, BSFileEvent* arg);
+		void UnregisterConnectedEvent(int fd, BSFileEvent* arg);
+		void UnregisterReadEvent(int fd, BSFileEvent* arg);
+		void UnregisterWriteEvent(int fd, BSFileEvent* arg);
+
 	public:
 		void RunLoop();
 		void SetStop();
 
-		int	GetSetSize();
 		bool ResizeSetSize(int setsize);
-
-		bool	CreateFileEvent(int fd, int mask, BSEventCallBack *proc);
-		void	DeleteFileEvent(int fd, int mask); 
-		int	GetFileEvent(int fd);
 
 		static int Wait(int fd, int mask, long long milliseconds);
 		const char* GetApiName();
@@ -107,16 +51,14 @@ public:
 		int	ProcessEvents();
 
 	private:
-		BSFileEvent* GetElement(int fd);
-
-	private:
-		int m_maxfd;
-		int m_setsize;
+		BSEventLoop();
+		
 		int m_stop;
-
-		vector<BSFileEvent> m_events; // 更适用于linux; windows最好mod4,待优化?????
-		vector<BSFiredEvent> m_fired;
 		BSMultiplexer* m_multiplexer;
+		BSReadableCallBack* m_accept_proc;
+		BSReadableCallBack* m_read_proc;
+		BSWriteableCallBack* m_write_proc;
+		BSWriteableCallBack* m_connected_proc;
 	};  
 }
 #endif

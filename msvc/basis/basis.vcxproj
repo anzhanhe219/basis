@@ -118,6 +118,7 @@ copy $(OutDir)\$(ProjectName).pdb $(ProjectDir)\..\..\lib\$(ProjectName).pdb</Co
     <ClInclude Include="..\..\include\basis_critical.h" />
     <ClInclude Include="..\..\include\basis_define.h" />
     <ClInclude Include="..\..\include\basis_event.h" />
+    <ClInclude Include="..\..\include\basis_event_callback.h" />
     <ClInclude Include="..\..\include\basis_event_loop.h" />
     <ClInclude Include="..\..\include\basis_ipaddr.h" />
     <ClInclude Include="..\..\include\basis_json.h" />

@@ -176,5 +176,8 @@
     <ClInclude Include="..\..\include\basis_socket_io.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\basis_event_callback.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

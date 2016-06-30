@@ -2,6 +2,7 @@
 #define _BASIS_MULTIPLEXER_H_
 
 #include "basis_define.h"
+#include "basis_event_callback.h"
 
 namespace basis
 {
@@ -19,9 +20,12 @@ namespace basis
 		static BSMultiplexer* Create(int sz);
 
 	public:
-		bool AddEvent(BSEventLoop* el, int fd, int mask);
-		bool DelEvent(BSEventLoop* el, int fd, int mask);
+		bool AddEvent(int fd, int mask, BSFileEvent* arg);
+		bool DelEvent(int fd, int mask, BSFileEvent* arg);
 		int Poll(BSEventLoop *el,  struct timeval *tvp);
+
+		BSFiredEvent* FetchFiredEvents();
+		BSFiredEvent* GetFiredEvents(uint32 index);
 
 		bool Resize(int sz);
 		const char* ApiName();
