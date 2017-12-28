@@ -17,7 +17,7 @@ public:
 		{
 			printf("write error\n");
 		}
-		//printf("send %d abcd.\n", fd);
+		printf("send %d abcd.\n", fd);
 		el->UnregisterWriteEvent(fd, partner);
 		if (++the_count % 10000 == 0)
 		{
@@ -40,7 +40,7 @@ public:
 			return;
 		}
 		buff[result] = 0;
-		//printf("recv remote(%d), buff(%s).\n", fd, buff);
+		printf("recv remote(%d), buff(%s).\n", fd, buff);
 		el->RegisterWriteEvent(fd, partner);
 		return;
 	}

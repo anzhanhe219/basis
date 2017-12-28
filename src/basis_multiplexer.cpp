@@ -100,7 +100,7 @@ namespace basis
 		{
 			int count = 0;
 			data->m_curr_index = 0;
-			data->m_partners.clear();			
+			data->m_fired_fds.clear();
 			map<int, BSFdPartner*>::iterator it = data->m_partners.begin();
 			for (; it != data->m_partners.end(); ++it)
 			{

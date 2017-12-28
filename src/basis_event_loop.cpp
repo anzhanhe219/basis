@@ -22,7 +22,7 @@ namespace basis
 		m_multiplexer = NULL;
 	}
 
-	basis::BSEventLoop* BSEventLoop::CreateEventLoop(int setsize)
+	BSEventLoop* BSEventLoop::CreateEventLoop(int setsize)
 	{		
 		if (BSEventLoop* el = new BSEventLoop())
 		{
@@ -48,7 +48,7 @@ namespace basis
 
 	int BSEventLoop::Wait(int fd, int mask, long long milliseconds)
 	{
-		FD_SET r_set, w_set;
+		fd_set r_set, w_set;
 		FD_ZERO(&r_set);
 		FD_ZERO(&w_set);
 		if (mask & fs_readable)
