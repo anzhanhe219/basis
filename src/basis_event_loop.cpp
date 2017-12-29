@@ -151,6 +151,7 @@ namespace basis
 		if (partner->m_logic_mask != fl_empty) return false;
 		if (!m_multiplexer->AddEvent(fd, fs_readable, partner)) return false;
 		partner->m_logic_mask |= fl_accept;
+		printf("RegisterAcceptEvent \n");
 		return true;
 	}
 
