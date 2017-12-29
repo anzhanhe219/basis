@@ -146,7 +146,7 @@ bool BSSocket::get_recv_bufsize( uint32& sz ) const
 int BSSocket::last_error()
 {
 	#ifdef __WINDOWS__
-	return GetLastError();
+	return WSAGetLastError();
 	#endif // __WINDOWS__
 
 	#ifdef __POSIX__
