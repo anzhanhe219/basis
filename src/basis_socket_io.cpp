@@ -81,14 +81,14 @@ namespace basis {
 		return true;
 	}
 
-	int BSSocketIO::write(int sock, void* buffer, uint32 bf_sz)
+	int BSSocketIO::write(int sock, const char* buffer, uint32 bf_sz)
 	{
-		return ::send(sock, (const char*)buffer, bf_sz, 0);
+		return ::send(sock, buffer, bf_sz, 0);
 	}
 
-	int BSSocketIO::read(int sock, void* buff, uint32 max_bf_sz)
+	int BSSocketIO::read(int sock, char* buff, uint32 max_bf_sz)
 	{
-		return ::recv(sock, (char*)buff, max_bf_sz, 0);
+		return ::recv(sock, buff, max_bf_sz, 0);
 	}
 
 	bool BSSocketIO::is_would_block(int error)

@@ -13,8 +13,8 @@ namespace basis
 		static int connect_asyn(BSSockAddr& addr, bool& success);
 		static bool listen(int sock, const BSSockAddr& sockaddr, int backlog);
 		static bool accept(int sock, vector<int>& new_socks);
-		static int write(int sock, void* buffer, uint32 bf_sz);
-		static int read(int sock, void* buff, uint32 max_bf_sz);
+		static int write(int sock, const char* buffer, uint32 bf_sz);
+		static int read(int sock, char* buff, uint32 max_bf_sz);
 
 		static bool is_would_block(int error);
 	};
