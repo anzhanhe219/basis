@@ -259,6 +259,7 @@ namespace basis
 		int nret = ::select(data->max_fd() + 1, &data->m_arg_r_set, &data->m_arg_w_set, NULL, tvp);
 		if (nret > 0)
 		{
+			printf("select return nret %d", nret);
 			int count = 0;
 			data->m_curr_index = 0;
 			data->m_fired_fds.clear();
@@ -273,7 +274,7 @@ namespace basis
 
 				int mark = fs_none;
 				if (FD_ISSET(fd, &data->m_arg_r_set))
-					mark |= fs_readable;
+					mark |= fs_readable;				
 				if (FD_ISSET(fd, &data->m_arg_w_set))
 					mark |= fs_writeable;
 				if (mark == fs_none) continue;
