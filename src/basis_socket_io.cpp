@@ -68,7 +68,7 @@ namespace basis {
 		while (1)
 		{
 			struct sockaddr addr;
-			int32 length = sizeof(addr);
+			socklen_t length = sizeof(addr);
 			int new_fd = ::accept(sock, &addr, &length);
 			if (new_fd < 0)
 			{
