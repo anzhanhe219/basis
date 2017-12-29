@@ -100,6 +100,7 @@ namespace basis {
 #endif // __WINDOWS__
 
 #ifdef __POSIX__
+		if (error == EAGAIN) return true;
 		if (error == EWOULDBLOCK) return true;
 		if (error == EINPROGRESS) return true; //?????
 		return false;
