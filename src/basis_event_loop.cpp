@@ -107,6 +107,7 @@ namespace basis
 			{
 				if (m_accept_proc == NULL) UNEXPECT();
 				m_accept_proc->onReadable(this, fr->m_fd, fp);
+				printf("ProcessEvents accept onReadable \n");
 				continue;
 			}
 
@@ -115,6 +116,7 @@ namespace basis
 			{
 				if (m_connected_proc == NULL) UNEXPECT();
 				m_connected_proc->onWriteable(this, fr->m_fd, fp);
+				printf("ProcessEvents connected onWriteable \n");
 				continue;
 			}
 
@@ -124,6 +126,7 @@ namespace basis
 			{
 				if (m_read_proc == NULL) UNEXPECT();
 				m_read_proc->onReadable(this, fr->m_fd, fp);
+				printf("ProcessEvents readable onReadable \n");
 				proccess_flag = true;
 			}
 			// writeable´¦Àí
@@ -131,9 +134,11 @@ namespace basis
 			{
 				if (m_write_proc == NULL) UNEXPECT();
 				m_write_proc->onWriteable(this, fr->m_fd, fp);
+				printf("ProcessEvents writeable onWriteable \n");
 				proccess_flag = true;
 			}
 			if (proccess_flag) continue;
+			printf("ProcessEvents invalid branch \n");
 			UNEXPECT();
 		}
 		return count;		
