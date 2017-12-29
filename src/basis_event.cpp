@@ -95,7 +95,7 @@ private:
 };
 
 BSEvent::BSEventImpl::BSEventImpl( bool manual )
-	: m_manual(m_manual)
+	: m_manual(manual)
 	, m_variable(false)
 {
 	// init mutex
