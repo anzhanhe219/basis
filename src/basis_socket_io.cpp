@@ -3,7 +3,7 @@
 
 namespace basis {
 
-	int BSSocketIO::connect_syne(BSSockAddr& addr, int ms)
+	int BSSocketIO::connect_sync(BSSockAddr& addr, int ms)
 	{
 		BSSocket sock;
 		if (!sock.open(st_tcp)) return -1;
@@ -16,8 +16,7 @@ namespace basis {
 			return sock.detach();
 		}
 		// ¼ì²é´íÎóÂë
-		int last_err = sock.last_error();
-		if (last_err == EINPROGRESS || last_err == EWOULDBLOCK)
+		if (is_would_block(sock.last_error()))
 		{
 			int mark = BSEventLoop::Wait(sock, fs_readable|fs_writeable, ms);
 			if (mark <= 0)
@@ -50,10 +49,7 @@ namespace basis {
 			return sock.detach();
 		}
 		// ¼ì²é´íÎóÂë
-		int last_err = sock.last_error();
-		if (last_err == EINPROGRESS 
-			|| last_err == EWOULDBLOCK
-			|| last_err == WSAEWOULDBLOCK)
+		if (is_would_block(sock.last_error()))
 		{
 			return sock.detach();
 		}
@@ -78,8 +74,7 @@ namespace basis {
 			{
 				int err = BSSocket().last_error();
 				if (err == EINTR) continue;
-				if (err == EWOULDBLOCK) break;	
-				if (err == WSAEWOULDBLOCK) break;
+				if (is_would_block(new_fd)) break;
 			}
 			new_socks.push_back(new_fd);
 		}
@@ -94,6 +89,24 @@ namespace basis {
 	int BSSocketIO::read(int sock, void* buff, uint32 max_bf_sz)
 	{
 		return ::recv(sock, (char*)buff, max_bf_sz, 0);
+	}
+
+	bool BSSocketIO::is_would_block(int error)
+	{
+#ifdef __WINDOWS__
+		if (error == WSAEWOULDBLOCK) return true;
+		if (error == WSAEINPROGRESS) return true; //?????
+		return false;		
+#endif // __WINDOWS__
+
+#ifdef __POSIX__
+		if (error == EWOULDBLOCK) return true;
+		if (error == EINPROGRESS) return true; //?????
+		return false;
+#endif // __POSIX__
+
+		UNEXPECT();
+		return false;
 	}
 
 }
