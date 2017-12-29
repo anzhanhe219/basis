@@ -74,7 +74,7 @@ namespace basis {
 			{
 				int err = BSSocket().last_error();
 				if (err == EINTR) continue;
-				if (is_would_block(new_fd)) break;
+				if (is_would_block(err)) break;
 			}
 			new_socks.push_back(new_fd);
 		}
