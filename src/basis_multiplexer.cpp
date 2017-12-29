@@ -12,10 +12,10 @@ namespace basis
 	class BSWinSelectData
 	{
 	public:
-		FD_SET m_r_set;
-		FD_SET m_w_set;
-		FD_SET m_arg_r_set;
-		FD_SET m_arg_w_set;
+		fd_set m_r_set;
+		fd_set m_w_set;
+		fd_set m_arg_r_set;
+		fd_set m_arg_w_set;
 
 	public:
 		uint32 m_curr_index;
@@ -173,10 +173,10 @@ namespace basis
 	class BSPOXSelectData
 	{
 	public:
-		FD_SET m_r_set;
-		FD_SET m_w_set;
-		FD_SET m_arg_r_set;
-		FD_SET m_arg_w_set;
+		fd_set m_r_set;
+		fd_set m_w_set;
+		fd_set m_arg_r_set;
+		fd_set m_arg_w_set;
 
 	public:
 		uint32 m_curr_index;
