@@ -168,6 +168,8 @@ namespace basis
 
 #else
 #ifdef __USE_POLL__
+
+#else // use select
 	class BSPOXSelectData
 	{
 	public:
@@ -317,9 +319,6 @@ namespace basis
 	{
 		return "linux select";
 	}
-
-#else // use select
-
 #endif
 #endif
 
